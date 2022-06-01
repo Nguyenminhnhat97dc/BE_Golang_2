@@ -17,9 +17,9 @@ import (
 	"gorm.io/gorm"
 )
 
-//var dsn = "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+var dsn = "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 
-var dsn = "sql6496052:JVUfiJ9mBJ@tcp(sql6.freemysqlhosting.net:3306)/sql6496052?charset=utf8mb4&parseTime=True&loc=Local"
+//var dsn = "sql6496052:JVUfiJ9mBJ@tcp(sql6.freemysqlhosting.net:3306)/sql6496052?charset=utf8mb4&parseTime=True&loc=Local"
 var upGrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -276,9 +276,8 @@ func ServiceProvider(c *gin.Context) {
 		Price        string
 		ProviderId   uint
 	}
-	var getServices []GetServices
 	for {
-
+		var getServices []GetServices
 		dbConnect.Raw("SELECT services_of_providers.services_id,services.name_services, services_of_providers.price, services_of_providers.provider_id FROM"+
 			" `services_of_providers` LEFT JOIN services on services_of_providers.services_id = services.id"+
 			" WHERE services_of_providers.provider_id = ?", data.Id).Scan(&getServices)
@@ -382,9 +381,8 @@ func RequirementsCustomer(c *gin.Context) {
 		AddressCustomer string
 		PhoneCustomer   string
 	}
-	var informationRequirementsCustomer []InformationRequirementsCustomer
-
 	for {
+		var informationRequirementsCustomer []InformationRequirementsCustomer
 		if err := dbConnect.Raw(
 			"SELECT requirements_customers.id,requirements_customers.name_services,requirements_customers.day_start,requirements_customers.time_start,customers.name_customer,customers.address_customer,customers.phone_customer"+
 				" FROM requirements_customers,customers WHERE requirements_customers.customer_id = customers.id and requirements_customers.status = ?", 0).Scan(&informationRequirementsCustomer).Error; err != nil {
@@ -393,9 +391,16 @@ func RequirementsCustomer(c *gin.Context) {
 				log.Println("error write json: " + err.Error())
 			}
 		} else {
-			err = ws.WriteJSON(informationRequirementsCustomer)
-			if err != nil {
-				log.Println("error write json: " + err.Error())
+			if informationRequirementsCustomer != nil {
+				err = ws.WriteJSON(informationRequirementsCustomer)
+				if err != nil {
+					log.Println("error write json: " + err.Error())
+				}
+			} else {
+				err = ws.WriteJSON("False")
+				if err != nil {
+					log.Println("error write json: " + err.Error())
+				}
 			}
 		}
 		time.Sleep(500 * time.Millisecond)
@@ -465,10 +470,9 @@ func TodoList(c *gin.Context) {
 		AddressCustomer string
 		PhoneCustomer   string
 	}
-	var todoList []TodoList
 
 	for {
-
+		var todoList []TodoList
 		if err := dbConnect.Raw(
 			"SELECT requirements_customers.id,requirements_customers.name_services,to_do_lists.status,requirements_customers.day_start,requirements_customers.time_start,"+
 				" customers.name_customer,customers.address_customer,customers.phone_customer"+
@@ -805,7 +809,6 @@ func CountPaginationRequirement(c *gin.Context) {
 	type CheckStatus struct {
 		Status uint
 	}
-	var count Count
 	var checkStatus CheckStatus
 	err = ws.ReadJSON(&checkStatus)
 
@@ -814,7 +817,7 @@ func CountPaginationRequirement(c *gin.Context) {
 		log.Fatal(err)
 	}
 	for {
-
+		var count Count
 		if err := dbConnect.Raw("SELECT COUNT(requirements_customers.id) AS "+"Count"+" FROM `requirements_customers` WHERE requirements_customers.status = ?", checkStatus.Status).Scan(&count).Error; err != nil {
 			err = ws.WriteJSON("False")
 			if err != nil {
@@ -838,6 +841,12 @@ func CountPaginationToDoList(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	}
+	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		log.Println("error get connection")
+		log.Fatal(err)
+	}
+	defer ws.Close()
 	type Count struct {
 		Count uint
 	}
@@ -845,27 +854,75 @@ func CountPaginationToDoList(c *gin.Context) {
 		Status     uint
 		ProviderId uint
 	}
-	var count Count
+
 	var checkStatus CheckStatus
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(c.Request.Body)
-	newString := buf.String()
-	json.Unmarshal([]byte(newString), &checkStatus)
-	fmt.Println(checkStatus)
-	if err := dbConnect.Raw("SELECT COUNT(to_do_lists.id) AS "+"Count"+" FROM to_do_lists WHERE to_do_lists.status = ? AND to_do_lists.provider_id = ?", checkStatus.Status, checkStatus.ProviderId).Scan(&count).Error; err != nil {
-		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := dbConnect.DB()
-		if err != nil {
-			log.Fatalln(err)
+	err = ws.ReadJSON(&checkStatus)
+
+	if err != nil {
+		log.Println("error read json")
+		log.Fatal(err)
+	}
+	for {
+		var count Count
+		if err := dbConnect.Raw("SELECT COUNT(to_do_lists.id) AS "+"Count"+" FROM to_do_lists WHERE to_do_lists.status = ? AND to_do_lists.provider_id = ?", checkStatus.Status, checkStatus.ProviderId).Scan(&count).Error; err != nil {
+			err = ws.WriteJSON("False")
+			if err != nil {
+				log.Println("error write json: " + err.Error())
+			}
+		} else {
+			err = ws.WriteJSON(count)
+			if err != nil {
+				log.Println("error write json: " + err.Error())
+			}
 		}
-		defer sqlDB.Close()
+
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func CountPaginationHistory(c *gin.Context) {
+	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database.")
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": count})
-		sqlDB, err := dbConnect.DB()
-		if err != nil {
-			log.Fatalln(err)
+		fmt.Println("connect Successfull.")
+	}
+	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		log.Println("error get connection")
+		log.Fatal(err)
+	}
+	defer ws.Close()
+	type Count struct {
+		Count uint
+	}
+	type CheckStatus struct {
+		Status     uint
+		ProviderId uint
+	}
+
+	var checkStatus CheckStatus
+	err = ws.ReadJSON(&checkStatus)
+
+	if err != nil {
+		log.Println("error read json")
+		log.Fatal(err)
+	}
+	for {
+		var count Count
+		if err := dbConnect.Raw("SELECT COUNT(to_do_lists.id) AS "+"Count"+" FROM to_do_lists WHERE to_do_lists.status = ? AND to_do_lists.provider_id = ?", checkStatus.Status, checkStatus.ProviderId).Scan(&count).Error; err != nil {
+			err = ws.WriteJSON("False")
+			if err != nil {
+				log.Println("error write json: " + err.Error())
+			}
+		} else {
+			err = ws.WriteJSON(count)
+			if err != nil {
+				log.Println("error write json: " + err.Error())
+			}
 		}
-		defer sqlDB.Close()
+
+		time.Sleep(1 * time.Second)
 	}
 }
 
