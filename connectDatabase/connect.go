@@ -23,36 +23,31 @@ var (
 	database string = "ds66578msdrmn"
 )
 
-var First *gorm.DB
+var dbConnect *gorm.DB
 
 func DBConn() (db *gorm.DB) {
-	if db == nil {
-		/* db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-		if err != nil {
-			panic("failed to connect database.")
-		} else {
-			fmt.Println("connect Successfull.")
-		} */
-		dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
-		fmt.Println(dsn)
-		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-		if err != nil {
-			panic("failed to connect database.")
-		} else {
-			fmt.Println("connect Successfull.")
-		}
-		sqlDB, err := db.DB()
-		if err != nil {
-			log.Fatalln(err)
-		}
-		//defer sqlDB.Close()
-		sqlDB.SetConnMaxIdleTime(time.Minute * 5)
-		sqlDB.SetMaxIdleConns(10)
-		sqlDB.SetMaxOpenConns(100)
-		sqlDB.SetConnMaxLifetime(time.Hour)
+	return dbConnect
+}
 
-		//sqlDB.SetConnMaxLifetime(1 * time.Second)
-		First = db
+func InitConnect() {
+	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	fmt.Println(dsn)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database.")
+	} else {
+		fmt.Println("connect Successfull.")
 	}
-	return First
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// //defer sqlDB.Close()
+	// sqlDB.SetConnMaxIdleTime(time.Minute * 5)
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	//sqlDB.SetConnMaxLifetime(1 * time.Second)
+	dbConnect = db
 }

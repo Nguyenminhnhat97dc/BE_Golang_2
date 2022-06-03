@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	//connectdatabase "Nguyenminhnhat97dc/BE_Golang/connectDatabase"
+	connectdatabase "Nguyenminhnhat97dc/BE_Golang/connectDatabase"
 	"Nguyenminhnhat97dc/BE_Golang/create_database/models"
 	"bytes"
 	"encoding/json"
@@ -13,20 +13,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"gorm.io/driver/postgres"
-
+	//"gorm.io/driver/postgres"
 	//"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	//"gorm.io/gorm"
 )
 
-var (
+/* var (
 	host     string = "ec2-54-86-224-85.compute-1.amazonaws.com"
 	port     string = "5432"
 	username string = "ubargppvqbrgnh"
 	password string = "5a993e8d8add6ae7cc0b7768b903b499700e17e5e2b967d6cd50f90ee75678d4"
 	database string = "ds66578msdrmn"
 )
-
+*/
 //var dsn = "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 
 //var dsn = "sql6497182:2j7eSP7MCU@tcp(sql6.freemysqlhosting.net:3306)/sql6497182?charset=utf8mb4&parseTime=True&loc=Local"
@@ -58,19 +57,20 @@ func FindServices(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	var services []models.Services
 	if err := dbConnect.Find(&services).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
@@ -89,20 +89,20 @@ func LimitServices(c *gin.Context) {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	var services []models.Services
 	count := c.Param("count")
 	number, _ := strconv.Atoi(count)
@@ -130,19 +130,20 @@ func AddRequirementCustomer(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type CheckCustomer struct {
 		Name         string
 		Address      string
@@ -222,15 +223,21 @@ func AddRequirementCustomer(c *gin.Context) {
 }
 
 func ServiceProvider(c *gin.Context) {
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database.")
+	} else {
+		fmt.Println("connect Successfull.")
+	} */
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -242,7 +249,8 @@ func ServiceProvider(c *gin.Context) {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
+	dbConnect := connectdatabase.DBConn()
 	//Upgrade get request to webSocket protocol
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -270,7 +278,7 @@ func ServiceProvider(c *gin.Context) {
 
 		var getServices []GetServices
 		dbConnect.Raw("SELECT services_of_providers.services_id,services.name_services, services_of_providers.price, services_of_providers.provider_id FROM"+
-			" `services_of_providers` LEFT JOIN services on services_of_providers.services_id = services.id"+
+			" services_of_providers LEFT JOIN services on services_of_providers.services_id = services.id"+
 			" WHERE services_of_providers.provider_id = ?", data.Id).Scan(&getServices)
 
 		err = ws.WriteJSON(getServices)
@@ -310,28 +318,26 @@ func ServiceProvider(c *gin.Context) {
 
 func AddServiceProvider(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type GetServicesOfProvider struct {
 		ServicesId uint
 		ProviderId uint
@@ -362,15 +368,15 @@ func RequirementsCustomer(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -383,6 +389,8 @@ func RequirementsCustomer(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	}
+	*/
+	dbConnect := connectdatabase.DBConn()
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("error get connection")
@@ -406,7 +414,6 @@ func RequirementsCustomer(c *gin.Context) {
 			err = ws.WriteJSON("False")
 			if err != nil {
 				log.Println("error write json: " + err.Error())
-
 				break
 			}
 		} else {
@@ -414,14 +421,12 @@ func RequirementsCustomer(c *gin.Context) {
 				err = ws.WriteJSON(informationRequirementsCustomer)
 				if err != nil {
 					log.Println("error write json: " + err.Error())
-
 					break
 				}
 			} else {
 				err = ws.WriteJSON("False")
 				if err != nil {
 					log.Println("error write json: " + err.Error())
-
 					break
 				}
 			}
@@ -468,15 +473,15 @@ func TodoList(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -488,7 +493,8 @@ func TodoList(c *gin.Context) {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
+	dbConnect := connectdatabase.DBConn()
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("error get connection")
@@ -603,28 +609,26 @@ func TodoList(c *gin.Context) {
 
 func Loggin(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type CheckLoggin struct {
 		User     string
 		Password string
@@ -644,28 +648,26 @@ func Loggin(c *gin.Context) {
 
 func FindProviderID(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type CheckID struct {
 		Id uint
 	}
@@ -684,28 +686,26 @@ func FindProviderID(c *gin.Context) {
 
 func FindPriceOfServices(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type CheckID struct {
 		Id string
 	}
@@ -732,28 +732,26 @@ func FindPriceOfServices(c *gin.Context) {
 
 func AddPrice(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type CheckInformation struct {
 		Id           uint
 		NameServices string
@@ -794,28 +792,26 @@ func AddPrice(c *gin.Context) {
 
 func AddTodoList(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	var requirementcustomer models.RequirementsCustomer
 	var addTodoList models.ToDoList
 	buf := new(bytes.Buffer)
@@ -840,32 +836,21 @@ func AddTodoList(c *gin.Context) {
 
 func CountPaginationRequirement(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	sqlDB.SetConnMaxIdleTime(time.Minute * 5)
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
-	if err != nil {
-		panic("failed to connect database.")
-	} else {
-		fmt.Println("connect Successfull.")
-	}
+	} */
+	dbConnect := connectdatabase.DBConn()
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("error get connection")
@@ -914,15 +899,15 @@ func CountPaginationToDoList(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -934,7 +919,10 @@ func CountPaginationToDoList(c *gin.Context) {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
+
+	dbConnect := connectdatabase.DBConn()
+
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("error get connection")
@@ -982,15 +970,15 @@ func CountPaginationHistory(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -1002,7 +990,10 @@ func CountPaginationHistory(c *gin.Context) {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
+
+	dbConnect := connectdatabase.DBConn()
+
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("error get connection")
@@ -1045,28 +1036,26 @@ func CountPaginationHistory(c *gin.Context) {
 
 func UpdateTodoList(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	} */
-
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	}
+	*/
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type GetInformation struct {
 		ProviderId            uint
 		RequirementCustomerId uint
@@ -1087,28 +1076,26 @@ func UpdateTodoList(c *gin.Context) {
 
 func DeleteServicesProvider(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type Information struct {
 		ProviderId uint
 		ServicesId uint
@@ -1133,15 +1120,15 @@ func HistoryList(c *gin.Context) {
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -1153,7 +1140,8 @@ func HistoryList(c *gin.Context) {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
+	dbConnect := connectdatabase.DBConn()
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("error get connection")
@@ -1217,28 +1205,26 @@ func HistoryList(c *gin.Context) {
 
 func UpdateInformationProvider(c *gin.Context) {
 	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	sqlDB, err := dbConnect.DB()
-	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	} */
 
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
-	sqlDB, err := dbConnect.DB()
+	} */
+	/* sqlDB, err := dbConnect.DB()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer sqlDB.Close()
-
+	defer sqlDB.Close() */
+	dbConnect := connectdatabase.DBConn()
 	type GetInformation struct {
 		ProviderId uint
 		Name       string
@@ -1257,67 +1243,5 @@ func UpdateInformationProvider(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": getInformation})
-	}
-}
-
-func TestCloseConnect(c *gin.Context) {
-	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database.")
-	} else {
-		fmt.Println("connect Successfull.")
-	} */
-	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
-	fmt.Println(dsn)
-	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database.")
-	} else {
-		fmt.Println("connect Successfull.")
-	}
-	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		log.Println("error get connection")
-		log.Fatal(err)
-	}
-
-	type Count struct {
-		Count uint
-	}
-	type CheckStatus struct {
-		Status     uint
-		ProviderId uint
-	}
-
-	var checkStatus CheckStatus
-	//err = ws.ReadJSON(&checkStatus)
-
-	/* if err != nil {
-		log.Println("error read json")
-		log.Fatal(err)
-	} */
-
-	defer ws.Close()
-	for {
-		var count Count
-		err = ws.ReadJSON(&checkStatus)
-		if err != nil {
-			fmt.Println(">>>>>>", err)
-			break
-		}
-		if err := dbConnect.Raw("SELECT COUNT(to_do_lists.id) AS "+"Count"+" FROM to_do_lists WHERE to_do_lists.status = ? AND to_do_lists.provider_id = ?", checkStatus.Status, checkStatus.ProviderId).Scan(&count).Error; err != nil {
-			err = ws.WriteJSON("False")
-			if err != nil {
-				log.Println("error write json: " + err.Error())
-			}
-		} else {
-			err = ws.WriteJSON(count)
-			if err != nil {
-				log.Println("error write json: " + err.Error())
-			}
-
-		}
-
-		time.Sleep(1 * time.Second)
 	}
 }

@@ -10,6 +10,8 @@ import (
 	//"time"
 	"os"
 
+	connectDatabase "Nguyenminhnhat97dc/BE_Golang/connectDatabase"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	//"github.com/gorilla/websocket"
@@ -21,6 +23,7 @@ func main() {
 		port = "8080"
 	}
 	fmt.Println("PORT : ", port)
+	connectDatabase.InitConnect()
 	//r := gin.New()
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -60,6 +63,5 @@ func main() {
 	r.POST("/update_todolist", controllers.UpdateTodoList)
 	r.POST("/deleteservices", controllers.DeleteServicesProvider)
 	r.POST("/updateprovider", controllers.UpdateInformationProvider)
-	r.GET("/test", controllers.TestCloseConnect)
 	r.Run(":" + port)
 }
