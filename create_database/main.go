@@ -4,41 +4,41 @@ import (
 	"Nguyenminhnhat97dc/BE_Golang/create_database/models"
 	"fmt"
 
-	//"gorm.io/driver/postgres"
+	"gorm.io/driver/postgres"
 
-	"gorm.io/driver/mysql"
+	//"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-/* var (
-	host     string = "ec2-34-230-153-41.compute-1.amazonaws.com"
+var (
+	host     string = "ec2-54-86-224-85.compute-1.amazonaws.com"
 	port     string = "5432"
-	username string = "gqkzhktjpbsnix"
-	password string = "3cc9ee2fd230e1696ee764c83ef829474e27577be64388c849031eb618a637ab"
-	database string = "d2u77vk80vvs75"
-) */
+	username string = "ubargppvqbrgnh"
+	password string = "5a993e8d8add6ae7cc0b7768b903b499700e17e5e2b967d6cd50f90ee75678d4"
+	database string = "ds66578msdrmn"
+)
 
 var DB *gorm.DB
 
 func main() {
 	//dsn := "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn := "sql6496052:JVUfiJ9mBJ@tcp(sql6.freemysqlhosting.net:3306)/sql6496052?charset=utf8mb4&parseTime=True&loc=Local"
+	/* dsn := "sql6497381:i3XlAhw4PG@tcp(sql6.freemysqlhosting.net:3306)/sql6497381?charset=utf8mb4&parseTime=True&loc=Local"
 	fmt.Println(dsn)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 
-	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
 	fmt.Println(dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	} */
+	}
 	db.AutoMigrate()
 	// Create Table
 	db.AutoMigrate(models.Provider{})

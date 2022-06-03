@@ -26,7 +26,7 @@ func main() {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"GET", "POST"},
-		AllowHeaders: []string{"Origin"},
+		AllowHeaders: []string{"Origin, Authorization, Content-Type"},
 		//AllowHeaders:     []string{"Origin, Authorization, Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
@@ -39,6 +39,7 @@ func main() {
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"Data": "hello world"})
 	})
+
 	//r.GET("/provider", controllers.FindProvider)
 	r.POST("/provider/id", controllers.FindProviderID)
 	r.GET("/services", controllers.FindServices)
@@ -59,6 +60,6 @@ func main() {
 	r.POST("/update_todolist", controllers.UpdateTodoList)
 	r.POST("/deleteservices", controllers.DeleteServicesProvider)
 	r.POST("/updateprovider", controllers.UpdateInformationProvider)
-
+	r.GET("/test", controllers.TestCloseConnect)
 	r.Run(":" + port)
 }
