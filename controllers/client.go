@@ -28,7 +28,6 @@ import (
 */
 //var dsn = "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 
-//var dsn = "sql6497182:2j7eSP7MCU@tcp(sql6.freemysqlhosting.net:3306)/sql6497182?charset=utf8mb4&parseTime=True&loc=Local"
 var upGrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -36,18 +35,6 @@ var upGrader = websocket.Upgrader{
 		return true
 	},
 }
-
-// select * from Provider
-/* func FindProvider(c *gin.Context) {
-	var provider []models.Provider
-	if err := database.DBConn().Find(&provider).Error; err != nil {
-		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		return
-	} else {
-		c.JSON(http.StatusOK, gin.H{"result": provider})
-		return
-	}
-} */
 
 // select * from Services
 func FindServices(c *gin.Context) {
@@ -362,34 +349,6 @@ func AddServiceProvider(c *gin.Context) {
 }
 
 func RequirementsCustomer(c *gin.Context) {
-	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database.")
-	} else {
-		fmt.Println("connect Successfull.")
-	} */
-	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
-	fmt.Println(dsn)
-	dbConnect, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database.")
-	} else {
-		fmt.Println("connect Successfull.")
-	} */
-	/* sqlDB, err := dbConnect.DB()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	sqlDB.SetConnMaxIdleTime(time.Minute * 5)
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
-	if err != nil {
-		panic("failed to connect database.")
-	} else {
-		fmt.Println("connect Successfull.")
-	}
-	*/
 	dbConnect := connectdatabase.DBConn()
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -436,34 +395,6 @@ func RequirementsCustomer(c *gin.Context) {
 		time.Sleep(500 * time.Millisecond)
 	}
 
-	/* type InformationRequirementsCustomer struct {
-		Id              uint
-		NameServices    string
-		DayStart        string
-		TimeStart       string
-		NameCustomer    string
-		AddressCustomer string
-		PhoneCustomer   string
-	}
-	var informationRequirementsCustomer []InformationRequirementsCustomer
-	type Pagination struct {
-		PaginationStart uint
-		PaginationEnd   uint
-	}
-	var pagination Pagination
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(c.Request.Body)
-	newString := buf.String()
-	json.Unmarshal([]byte(newString), &pagination)
-	if err := dbConnect.Raw(
-		"SELECT requirements_customers.id,requirements_customers.name_services,requirements_customers.day_start,requirements_customers.time_start,customers.name_customer,customers.address_customer,customers.phone_customer"+
-			" FROM requirements_customers,customers WHERE requirements_customers.customer_id = customers.id and requirements_customers.status = ? LIMIT ?,?", 0, pagination.PaginationStart, pagination.PaginationEnd).Scan(&informationRequirementsCustomer).Error; err != nil {
-		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		return
-	} else {
-		c.JSON(http.StatusOK, gin.H{"result": informationRequirementsCustomer})
-		return
-	} */
 }
 
 func TodoList(c *gin.Context) {
@@ -712,7 +643,7 @@ func FindPriceOfServices(c *gin.Context) {
 	type Price struct {
 		NameServices string
 		Price        string
-		Name         string
+		/* Name         string */
 	}
 	var checkID CheckID
 	var price []Price
@@ -721,7 +652,7 @@ func FindPriceOfServices(c *gin.Context) {
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkID)
 	if err := dbConnect.Raw(
-		"SELECT services.name_services, services_of_providers.price, providers.name from"+
+		"SELECT services.name_services, services_of_providers.price from"+
 			" services_of_providers,services,providers WHERE services_of_providers.services_id = services.id and"+
 			" services_of_providers.provider_id = providers.id and providers.id = ?", checkID.Id).Scan(&price).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
@@ -889,7 +820,7 @@ func CountPaginationRequirement(c *gin.Context) {
 			}
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 func CountPaginationToDoList(c *gin.Context) {
@@ -1056,21 +987,38 @@ func UpdateTodoList(c *gin.Context) {
 	}
 	defer sqlDB.Close() */
 	dbConnect := connectdatabase.DBConn()
+
 	type GetInformation struct {
 		ProviderId            uint
 		RequirementCustomerId uint
+		InformationServices   string `gorm:"type: json"`
 	}
+
 	var getInformation GetInformation
-	var updateTodoList models.ToDoList
+	var todoList models.ToDoList
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
+	/* res, err := PrettyString(newString)
+	if err != nil {
+		log.Fatal(err)
+	} */
+	fmt.Println(newString)
 	json.Unmarshal([]byte(newString), &getInformation)
+	addhistory := models.HistoryList{
+		ProviderID:             getInformation.ProviderId,
+		RequirementsCustomerID: getInformation.RequirementCustomerId,
+		InformationServices:    getInformation.InformationServices,
+	}
 	fmt.Println("><<<<<<<<<<<<<<<<<<<<<", getInformation)
-	if err := dbConnect.Raw("UPDATE to_do_lists set status = 1, day_end = CURRENT_DATE WHERE provider_id = ? and requirements_customer_id  = ?", getInformation.ProviderId, getInformation.RequirementCustomerId).Scan(&updateTodoList).Error; err != nil {
+	if err := dbConnect.Select("provider_id", "requirements_customer_id", "information_services").Create(&addhistory).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"result": "True"})
+		if err := dbConnect.Raw("UPDATE to_do_lists set status = 1 where requirements_customer_id = ? and provider_id = ?", getInformation.RequirementCustomerId, getInformation.ProviderId).Scan(&todoList).Error; err != nil {
+			c.JSON(http.StatusOK, gin.H{"result": "update Todolist False"})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"result": "True"})
+		}
 	}
 }
 
@@ -1243,5 +1191,56 @@ func UpdateInformationProvider(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": getInformation})
+	}
+}
+
+func GetHistory(c *gin.Context) {
+	dbConnect := connectdatabase.DBConn()
+	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		log.Println("error get connection")
+		log.Fatal(err)
+	}
+	type Information struct {
+		Id uint
+	}
+	type ResultInformation struct {
+		NameCustomer        string
+		AddressCustomer     string
+		PhoneCustomer       string
+		DayStart            string
+		TimeStart           string
+		DayEnd              string
+		InformationServices string `gorm:"type: json"`
+	}
+	var getInformation Information
+	var resultInformation []ResultInformation
+	err = ws.ReadJSON(&getInformation)
+	if err != nil {
+		log.Println("error read Json aksjdaslkdhkaj")
+		log.Fatal(err)
+	}
+	/* 	buf := new(bytes.Buffer)
+	   	buf.ReadFrom(c.Request.Body)
+	   	newString := buf.String()
+	   	json.Unmarshal([]byte(newString), &getInformation) */
+	for {
+		if err := dbConnect.Raw("select customers.name_customer,customers.address_customer,customers.phone_customer,"+
+			" requirements_customers.day_start,requirements_customers.time_start,history_lists.day_end,"+
+			" history_lists.information_services from history_lists,requirements_customers,customers where provider_id = ?"+
+			" and requirements_customers.customer_id = customers.id and requirements_customers.id = history_lists.requirements_customer_id", getInformation.Id).Scan(&resultInformation).Error; err != nil {
+			err = ws.WriteJSON("False")
+			if err != nil {
+				log.Println("error write json: " + err.Error())
+				break
+			}
+		} else {
+			err = ws.WriteJSON(resultInformation)
+			if err != nil {
+				log.Println("error write json: " + err.Error())
+				break
+			}
+		}
+		time.Sleep(1 * time.Second)
 	}
 }

@@ -61,3 +61,14 @@ type ToDoList struct {
 	DayEnd                 string //`gorm:"type: varchar(10); default null"`
 	Status                 uint   `gorm:"default 0"`
 }
+
+type HistoryList struct {
+	gorm.Model
+	RequirementsCustomer   RequirementsCustomer `gorm:"foreignKey:RequirementsCustomerID"`
+	RequirementsCustomerID uint
+	Provider               Provider `gorm:"foreignKey:ProviderID"`
+	ProviderID             uint
+	DayEnd                 string //`gorm:"type: varchar(10); default null"`
+	Status                 uint   `gorm:"type boolean default 1"`
+	InformationServices    string `gorm:"type: json"`
+}

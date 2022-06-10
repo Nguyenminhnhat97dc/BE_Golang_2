@@ -21,8 +21,7 @@ var (
 var DB *gorm.DB
 
 func main() {
-	//dsn := "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
-	/* dsn := "sql6497381:i3XlAhw4PG@tcp(sql6.freemysqlhosting.net:3306)/sql6497381?charset=utf8mb4&parseTime=True&loc=Local"
+	/* dsn := "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 	fmt.Println(dsn)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -40,6 +39,7 @@ func main() {
 		fmt.Println("connect Successfull.")
 	}
 	db.AutoMigrate()
+
 	// Create Table
 	db.AutoMigrate(models.Provider{})
 	db.AutoMigrate(models.User{})
@@ -48,6 +48,7 @@ func main() {
 	db.AutoMigrate(models.Customer{})
 	db.AutoMigrate(models.RequirementsCustomer{})
 	db.AutoMigrate(models.ToDoList{})
+	db.AutoMigrate(models.HistoryList{})
 	// insert Provider
 	provider := []models.Provider{
 		{Name: "Nguyễn Minh Nhật", Address: "Cam Ranh - Khánh Hòa", CCCD: "037153000257", Phone: "0975661107", Introduce: "abc"},
